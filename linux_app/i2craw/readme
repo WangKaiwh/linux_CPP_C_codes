@@ -1,0 +1,6 @@
+
+i2c设备的读写程序，包括master read write以及slave read write。
+
+注意：
+此代码只是测试类IPMB的可行性的程序，并不严谨。
+
