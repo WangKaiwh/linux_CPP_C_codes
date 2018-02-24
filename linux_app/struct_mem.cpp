@@ -1,5 +1,7 @@
 #include <iostream>
+#include <cstdio>
 #include <cstdlib>
+#include <cstddef>
 
 typedef unsigned short UINT16;
 typedef unsigned char  UINT8;
@@ -35,16 +37,19 @@ int main()
     .u16BusSpeedInKHz = 0xbbcc
     };
 
-    std::system("uname -a");
+    /*std::*/system("uname -a");
+
+    std::cout << "u8PrivateBusId offsetof SPIAPhysicalI2CBus:" << offsetof(SPIAPhysicalI2CBus, u8PrivateBusId) 
+        << std::endl;
 
     std::cout << "total size: " << sizeof(SPIAPhysicalI2CBus) << "(Bytes)" << std::endl; 
 
     for (int i=0; i<sizeof(SPIAPhysicalI2CBus); i++)
     {   
         UINT8 *p = ((UINT8 *)&obj) + i;  
-        std::cout << " " << *p; 
+        printf("%#x ", *p);
     }
-    std::cout << std::endl;
+    printf("\n");
 
     return 0;
 }
