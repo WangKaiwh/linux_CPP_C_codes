@@ -14,8 +14,10 @@ int main(int argc, char** argv) {
 
     if (f.a->s) {
         printf("%d\n", f.a->s);
-	printf("%s\n", f.a->s);
+        *f.a->s = 8;
     }
+
+
     return 0;
 }
 

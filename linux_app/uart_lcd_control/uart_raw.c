@@ -12,7 +12,7 @@
 
 static int open_uart_dev(int b_uart_num)
 {
-    int fd = 0, b_LogiChannel = 0;
+    int fd = 0;
 
     switch(b_uart_num)
     {
