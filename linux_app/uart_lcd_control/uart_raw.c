@@ -7,8 +7,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 
-#define LCD_UART_NO			  3 // UART3
-#define LCD_UART_EABLE_CMD    0xb00
+#define LCD_UART_NO			  4 // UART3
 
 static int open_uart_dev(int b_uart_num)
 {
@@ -56,11 +55,6 @@ static void uart_speed_set(int fd)
      * Set the new options for the port...
      */
     tcsetattr(fd, TCSANOW, &options);
-}
-
-static void lcd_uart_enable(int fd)
-{
-	ioctl(fd, LCD_UART_EABLE_CMD, 0);
 }
 
 int set_opt(int fd,int nSpeed,int nBits,char nEvent,int nStop)  
@@ -184,9 +178,6 @@ int main(int argc, char **argv)
     //uart_speed_set(fd);
     set_opt(fd, 9600, 8, 'N', 1);
 
-	/** 打开控制LCD串口的通路以及IO复用 */
-    lcd_uart_enable(fd);
-
     opt = argv[1];
    
     /** 刷新按键界面 */
@@ -224,7 +215,6 @@ int main(int argc, char **argv)
     else
         printf("write over char ok\n");
 
-out:
     close(fd);
 
     return 0;
