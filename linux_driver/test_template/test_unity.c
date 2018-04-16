@@ -12,7 +12,7 @@ int main()
 {
     test();
 
-    RUN_TEST_EQUAL_INT(100, v_test);
+    TEST_ASSERT_EQUAL_INT(100, v_test);
 
     return 0;
 }

@@ -28,7 +28,7 @@ extern "C"
     } while (0)
 #endif
 
-static inline int TEST_ASSERT_EQUAL_INT(
+static inline int __ASSERT_EQUAL_INT(
         const char *file,
         const char *func,
         int line,
@@ -45,8 +45,8 @@ static inline int TEST_ASSERT_EQUAL_INT(
     return true;
 }
 
-#define RUN_TEST_EQUAL_INT(expected, actual) do{\
-    if (false == TEST_ASSERT_EQUAL_INT(__FILE__, __func__, __LINE__, expected, actual))\
+#define TEST_ASSERT_EQUAL_INT(expected, actual) do{\
+    if (false == __ASSERT_EQUAL_INT(__FILE__, __func__, __LINE__, expected, actual))\
             return -1;\
     } while (0)
 
