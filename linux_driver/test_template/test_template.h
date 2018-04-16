@@ -16,12 +16,12 @@
 #endif
 
 #if linux_driver
-    // ...  ##__VA_ARGS__, 在windows和linux下面均可以的方法
+    // ...  ##__VA_ARGS__, windows and linux compatible
     #define OUTPUT_MSG(fmt, ...) do {\
         printk(KERN_EMERG fmt, ##__VA_ARGS__);\
     } while (0)
 #else
-    // ...  ##__VA_ARGS__, 在windows和linux下面均可以的方法
+    // ...  ##__VA_ARGS__, windows and linux compatible
     #define OUTPUT_MSG(fmt, ...) do {\
         printf(fmt, ##__VA_ARGS__); \
     } while (0)
