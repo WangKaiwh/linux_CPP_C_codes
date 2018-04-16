@@ -27,13 +27,33 @@
 #include "inc/ioaccess.h"
 #include "inc/adc_define.h"
 
+#define ENABLE_TDD      1
+
+// product codes
 
 
+// tdd codes
+#if ENABLE_TDD > 0
+#include "test_template/test_template.h"
+
+#endif
+
+int __init adc_mod_init(void)
+{
+    return 0;
+}
+
+void __exit adc_mod_cleanup (void)
+{
+    
+}
 
 MODULE_LICENSE ("GPL");
 MODULE_AUTHOR("WangKai -- https://blog.csdn.net/kao2406");
 MODULE_DESCRIPTION("ADC driver");
 
+module_init (adc_mod_init);
+module_exit (adc_mod_cleanup);
 
 
 

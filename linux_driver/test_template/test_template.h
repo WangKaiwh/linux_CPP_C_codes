@@ -1,8 +1,6 @@
 #ifndef __C_TEST_TEMPLATE_H__
 #define __C_TEST_TEMPLATE_H__
 
-#include <stdio.h>
-
 #ifdef __cplusplus  
     extern "C"
 #endif
@@ -15,7 +13,7 @@
 #define true    1 
 #endif
 
-#if linux_driver
+#if __KERNEL__
     // ...  ##__VA_ARGS__, windows and linux compatible
     #define OUTPUT_MSG(fmt, ...) do {\
         printk(KERN_EMERG fmt, ##__VA_ARGS__);\

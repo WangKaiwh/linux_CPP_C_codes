@@ -9,7 +9,7 @@ default:
 	$(Q)if [ -z $(obj-m:.o=.ko) ]; then sudo insmod $(obj-m:.o=.ko) ;fi
 
 clean:
-	rm -rf *.o *.ko *.order *.symvers *.mod.c *.o.cmd
+	rm -rf *.o *.ko *.order *.symvers *.mod.c
 
 endif
 
