@@ -24,24 +24,29 @@ extern "C"
 #else
     // ...  ##__VA_ARGS__, 在windows和linux下面均可以的方法
     #define OUTPUT_MSG(fmt, ...) do {\
-        printf("%s, %d: ", __FILE__, __LINE__); \
         printf(fmt, ##__VA_ARGS__); \
     } while (0)
 #endif
 
-static inline int TEST_ASSERT_EQUAL_INT(int expected, int actual)
+static inline int TEST_ASSERT_EQUAL_INT(
+        const char *file,
+        const char *func,
+        int line,
+        int expected, 
+        int actual)
 {
     if (expected != actual)
     {
-        OUTPUT_MSG("FAILED! expected: %d, actual: %d\n", expected, actual);
+        OUTPUT_MSG("%s, %s, %d, FAILED! expected: %d, actual: %d\n", 
+                file, func, line, expected, actual);
         return false;
     }
-    OUTPUT_MSG("OK\n");
+    OUTPUT_MSG("%s, %s, %d, OK\n", file, func, line);
     return true;
 }
 
-#define RUN_TEST(f) do{\
-        if ( false == (f) )\
+#define RUN_TEST_EQUAL_INT(expected, actual) do{\
+    if (false == TEST_ASSERT_EQUAL_INT(__FILE__, __func__, __LINE__, expected, actual))\
             return -1;\
     } while (0)
 
