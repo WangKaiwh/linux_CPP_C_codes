@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #ifdef __cplusplus  
-extern "C"
+    extern "C"
 #endif
 
 #ifndef false 
@@ -18,7 +18,6 @@ extern "C"
 #if linux_driver
     // ...  ##__VA_ARGS__, 在windows和linux下面均可以的方法
     #define OUTPUT_MSG(fmt, ...) do {\
-        printk(KERN_EMERG "%s, %s, %d: ", __FILE__, __func__,  __LINE__);\
         printk(KERN_EMERG fmt, ##__VA_ARGS__);\
     } while (0)
 #else
