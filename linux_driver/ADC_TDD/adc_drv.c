@@ -99,7 +99,6 @@ int test_adc_mod_init__clock_divisor_0x40(void)
 int test_adc_mod_init__reg_chardev(void)
 {
     // nothing do to
-    
     return true;
 }
 
