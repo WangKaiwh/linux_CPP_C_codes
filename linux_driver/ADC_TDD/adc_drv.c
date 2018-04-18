@@ -83,23 +83,27 @@ void test_teardown(void)
 {
 }
 
-void test_adc_mod_init__all_chan_disable(void)
+int test_adc_mod_init__all_chan_disable(void)
 {
     TEST_ASSERT_EQUAL_INT(0, adc_get_chan_status(0));
     TEST_ASSERT_EQUAL_INT(0, adc_get_chan_status(1));
+    return true;
 }
 
-void test_adc_mod_init__clock_divisor_0x40(void)
+int test_adc_mod_init__clock_divisor_0x40(void)
 {
     TEST_ASSERT_EQUAL_INT(0x40, adc_get_clock_divisor());
+    return true;
 }
 
-void test_adc_mod_init__reg_chardev(void)
+int test_adc_mod_init__reg_chardev(void)
 {
     // nothing do to
+    
+    return true;
 }
 
-void test_adc_mod_init__ioctl_set_clock(void)
+int test_adc_mod_init__ioctl_set_clock(void)
 {
     const int set_divisor = 0xa5;
     int result_divisor = 0;
@@ -112,6 +116,8 @@ void test_adc_mod_init__ioctl_set_clock(void)
     result_divisor = adc_get_clock_divisor();
 
     TEST_ASSERT_EQUAL_INT(result_divisor, set_divisor);
+    
+    return true;
 }
 #endif
 
@@ -119,12 +125,15 @@ int __init adc_mod_init(void)
 {
     
 #if ENABLE_TDD > 0
-    printk(KERN_EMERG "\n*********************\n");
-    test_setup();
-    test_adc_mod_init__all_chan_disable();
-    test_adc_mod_init__reg_chardev();
-    test_adc_mod_init__ioctl_set_clock();
-    printk(KERN_EMERG "\n*********************\n");
+    int __unity_cnt = 0;
+    TEST_BEGIN(__unity_cnt);
+    
+    RUN_TEST(test_adc_mod_init__all_chan_disable(), __unity_cnt);
+    RUN_TEST(test_adc_mod_init__clock_divisor_0x40(), __unity_cnt);
+    RUN_TEST(test_adc_mod_init__reg_chardev(), __unity_cnt);
+    RUN_TEST(test_adc_mod_init__ioctl_set_clock(), __unity_cnt);
+
+    TEST_END(__unity_cnt);
 #endif
     return 0;
 }
@@ -134,7 +143,7 @@ void __exit adc_mod_cleanup (void)
 
 }
 
-MODULE_LICENSE ("GPL");
+MODULE_LICENSE("GPL");
 MODULE_AUTHOR("WangKai -- https://blog.csdn.net/kao2406");
 MODULE_DESCRIPTION("ADC driver");
 
