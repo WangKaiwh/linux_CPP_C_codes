@@ -1,6 +1,6 @@
 obj-m := adc_drv.o
 ifneq ($(KERNELRELEASE),)
-EXTRA_CFLAGS += -Wno-error=date-time
+#EXTRA_CFLAGS += -Wno-error=date-time
 else
 	KERNELDIR ?= /lib/modules/$(shell uname -r)/build
     override LDFLAGS=

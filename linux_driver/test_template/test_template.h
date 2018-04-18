@@ -43,8 +43,8 @@ static inline int __ASSERT_EQUAL_INT(
 }
 
 #define TEST_ASSERT_EQUAL_INT(expected, actual) do{\
-    if (false == __ASSERT_EQUAL_INT(__FILE__, __func__, __LINE__, expected, actual))\
-            return -1;\
+    if ( false == __ASSERT_EQUAL_INT(__FILE__, __func__, __LINE__, expected, actual) )\
+            return;\
     } while (0)
 
 #endif

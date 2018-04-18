@@ -16,33 +16,35 @@
 //ADC Engine Register
 #define PCI_AHB_OFFSET                    0x10000
 #define ADC_ENGINE_ADDRESS                0x1E6E9000
-#define ADC_OFFSET                        ADC_ENGINE_ADDRESS
-#define ADC_ENGINE_CONTROL_REGISTER       0x0 + ADC_OFFSET
-#define ADC_INTERRUPT_CONTROL_REGISTER    0x4 + ADC_OFFSET
-#define ADC_CLOCK_CONTROL_REGISTER        0xC + ADC_OFFSET
-#define ADC_DATA_REGISTER                 0x10 + ADC_OFFSET
-#define ADC_DATA_0_1                      0x10 + ADC_OFFSET
-#define ADC_DATA_2_3                      0x14 + ADC_OFFSET
-#define ADC_DATA_4_5                      0x18 + ADC_OFFSET
-#define ADC_DATA_6_7                      0x1C + ADC_OFFSET
-#define ADC_DATA_8_9                      0x20 + ADC_OFFSET
-#define ADC_DATA_10_11                    0x24 + ADC_OFFSET
-#define ADC_DATA_12                       0x28 + ADC_OFFSET
-#define ADC_DATA_13                       0x2C + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_0           0x30 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_1           0x34 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_2           0x38 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_3           0x3C + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_4           0x40 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_5           0x44 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_6           0x48 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_7           0x4C + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_8           0x50 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_9           0x54 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_10          0x58 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_11          0x5C + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_12          0x60 + ADC_OFFSET
-#define ADC_UPPER_LOWER_BOUND_13          0x64 + ADC_OFFSET
+
+// OFFSET
+#define ADC_ENGINE_CONTROL_REGISTER       0x0
+#define ADC_INTERRUPT_CONTROL_REGISTER    0x4
+#define ADC_CLOCK_CONTROL_REGISTER        0xC
+#define ADC_DATA_REGISTER                 0x10
+#define ADC_DATA_0_1                      0x10
+#define ADC_DATA_2_3                      0x14
+#define ADC_DATA_4_5                      0x18
+#define ADC_DATA_6_7                      0x1C
+#define ADC_DATA_8_9                      0x20
+#define ADC_DATA_10_11                    0x24
+#define ADC_DATA_12                       0x28
+#define ADC_DATA_13                       0x2C
+#define ADC_UPPER_LOWER_BOUND_0           0x30
+#define ADC_UPPER_LOWER_BOUND_1           0x34
+#define ADC_UPPER_LOWER_BOUND_2           0x38
+#define ADC_UPPER_LOWER_BOUND_3           0x3C
+#define ADC_UPPER_LOWER_BOUND_4           0x40
+#define ADC_UPPER_LOWER_BOUND_5           0x44
+#define ADC_UPPER_LOWER_BOUND_6           0x48
+#define ADC_UPPER_LOWER_BOUND_7           0x4C
+#define ADC_UPPER_LOWER_BOUND_8           0x50
+#define ADC_UPPER_LOWER_BOUND_9           0x54
+#define ADC_UPPER_LOWER_BOUND_10          0x58
+#define ADC_UPPER_LOWER_BOUND_11          0x5C
+#define ADC_UPPER_LOWER_BOUND_12          0x60
+#define ADC_UPPER_LOWER_BOUND_13          0x64
+
 
 //ADC_ENGINE_CONTROL_REGISTER
 #define ENGINE_ENABLE                     (1 << 0)
