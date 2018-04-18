@@ -32,8 +32,6 @@
 static void *__iomem adc_reg_base = NULL;
 
 // product codes
-#define read_register(address)	readl(address)
-
 static int adc_get_chan_status(int chan_no)
 {
     return 0;
@@ -41,30 +39,31 @@ static int adc_get_chan_status(int chan_no)
 
 static int adc_get_clock_divisor(void)
 {
-    return 0x40;
+    u32 regv = readl(adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
+
+    return regv & ADC_DIVISOR_OF_ADC_CLOCK;
 }
 
 static void adc_set_clock(int divisor)
 {
-#if 0
     u32 regv = readl(adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
 
     regv &= ~ADC_DIVISOR_OF_ADC_CLOCK; // clear [9:0]
     regv |= divisor;
     
     writel(regv, adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
-#else
-    writel(divisor, adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
-#endif
 }
 
 static int adc_ioctl (struct file *filp,
                             unsigned int cmd,
                             unsigned long arg) 
 {
+    IO_ACCESS_DATA *io_access = (IO_ACCESS_DATA *)arg;
+
     switch (cmd)
     {
         case IOCTL_SET_ADC_CLOCK:
+        adc_set_clock(io_access->Data);
         break;
         
     }
@@ -108,7 +107,7 @@ void test_adc_mod_init__ioctl_set_clock(void)
     IO_ACCESS_DATA io_data;
     io_data.Data = set_divisor;
 
-    adc_ioctl(NULL, IOCTL_SET_ADC_CLOCK, &io_data);
+    adc_ioctl(NULL, IOCTL_SET_ADC_CLOCK, (unsigned long)&io_data);
 
     result_divisor = adc_get_clock_divisor();
 
