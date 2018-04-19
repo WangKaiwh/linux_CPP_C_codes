@@ -2,9 +2,9 @@
 * AST 2500 ADC Driver
 * Portions Copyright WangKai .
 *
-*  https://blog.csdn.net/kao2406
+* https://blog.csdn.net/kao2406
 *  
-*  用TDD的思路重构ADC驱动.
+* 用TDD的思路重构ADC驱动.
 *
 * This program is free software; you can redistribute it and/or modify it
 * under the terms and conditions of the GNU General Public License,
@@ -67,6 +67,7 @@ static int adc_ioctl (struct file *filp,
         break;
         
     }
+    
     return 0;
 }
 

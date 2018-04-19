@@ -1,5 +1,15 @@
-
-
+/*
+*  描述: C语言单元测试模板
+*  
+*  作者: 王凯
+*
+*  日期: 2018.04.18
+*
+*  博客: https://blog.csdn.net/kao2406
+* 
+*  GitHub: https://github.com/WangKaiwh
+*
+*/
 #ifndef __C_TEST_TEMPLATE_H__
 #define __C_TEST_TEMPLATE_H__
 
@@ -44,6 +54,27 @@ static inline int __ASSERT_EQUAL_INT(
     return true;
 }
 
+#define MIN(x, y)  ((x) > (y) ? (y) : (x))
+
+static inline int __ASSERT_EQUAL_STRING(
+        const char *file,
+        const char *func,
+        int line,
+        const char *left, 
+        int l_bufsize,
+        const char *right,
+        int r_bufsize)
+{
+    if (NULL == left || NULL == right)
+    {
+        OUTPUT_MSG("null pointer error!!!\n");
+        return false;
+    }
+
+    int realsize = MIN(l_bufsize, r_bufsize);
+
+    return 0 == strncmp(left, right, realsize);
+}
 
 /////////////////////////////////////////////// 
 /// 对外接口(external interface) //////////////////////////////////
@@ -53,20 +84,26 @@ static inline int __ASSERT_EQUAL_INT(
             return false;\
     } while (0)
 
+#define TEST_ASSERT_EQUAL_STRING(left, l_bufsize, right, r_bufsize) do {\
+    if ( false == __ASSERT_EQUAL_STRING(__FILE__, __func__, __LINE__, \
+        (left), (l_bufsize), (right), (r_bufsize)) ) \
+        return false; \
+    } while (0)
+
 #define TEST_BEGIN(__cnt_macro_val) do {\
         (__cnt_macro_val) = 0;\
         OUTPUT_MSG( "\n*********************\n");\
         test_setup(); \
     } while (0)
 
-#define RUN_TEST(__f, __cnt) do {\
+#define RUN_TEST(__f, __cnt_macro_val) do {\
         if (false == (__f))\
-            (__cnt)++; \
+            (__cnt_macro_val)++; \
     } while (0)
 
 #define TEST_END(__cnt_macro_val) do {\
         OUTPUT_MSG("%s\n", 0==(__cnt_macro_val) ? "OK" : "FAILED");\
-        OUTPUT_MSG("\n*********************\n"); \
+        OUTPUT_MSG("*********************\n"); \
         test_teardown(); \
     } while (0)
 
