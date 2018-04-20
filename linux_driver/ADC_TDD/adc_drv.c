@@ -73,8 +73,10 @@ static void adc_enable_chan(int chan_no, int enable)
 static u32 adc_measure(int chan_no)
 {
     void *__iomem database = adc_reg_base + ADC_DATA_REGISTER;
-
     u8 offset = 4 * (chan_no / 2);
+
+    if (0 == adc_get_chan_status(chan_no))
+        return -1;
 
     u32 regv = readl(database + offset);
 
@@ -101,8 +103,13 @@ static int adc_ioctl (struct file *filp,
         case IOCTL_ADC_MEASURE:
         {
             u32 rawdata = 0;
+            
             rawdata = adc_measure(io_access->Address);
-            io_access->Data = rawdata;
+            if (rawdata < 0)
+                return -1;
+            else
+                io_access->Data = rawdata;
+                
             return 0;
         }
         
@@ -128,6 +135,7 @@ static void adc_init(void)
 void test_setup(void)
 {
     adc_reg_base = kmalloc(4096, GFP_KERNEL);
+    memset(adc_reg_base, 0, 4096);
 }
 
 void test_teardown(void)
@@ -234,21 +242,44 @@ int test_adc_get_chan_status__after_disable_status_off(void)
     return true;
 }
 
+static void adc_set_stubval(int chan_no, u16 stubval)
+{
+    void * __iomem base = adc_reg_base + ADC_DATA_REGISTER;
+    u8 offset = 4 * (chan_no / 2);
+    u32 regv = 0;
+
+    regv = readl(base + offset);
+    if (0 == chan_no % 2)
+    {
+        regv &= ~0x3ff;
+        regv |= stubval;
+    }
+    else
+    {
+        regv &= ~(0x3ff << 16);
+        regv |= stubval << 16;
+    }
+
+    writel(regv, base + offset);
+}
+
 int test_adc_measure__when_chan_enable(void)
 {
     IO_ACCESS_DATA io_data;
+    u16 stubval = 0xa5;
 
+    // stub val 
+    adc_set_stubval(4, stubval);
     // first, enable one chan
     memset(&io_data, 0, sizeof(io_data));
     io_data.Address = 4;
     io_data.Data = 1;
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
-
     // second, measure
     memset(&io_data, 0, sizeof(io_data));
     io_data.Address = 4;
     adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
-    TEST_ASSERT_TRUE(0 != io_data.Data);
+    TEST_ASSERT_EQUAL_INT(stubval, io_data.Data);
 
     return true;
 }
