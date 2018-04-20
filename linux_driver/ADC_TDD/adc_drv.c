@@ -34,7 +34,9 @@ static void *__iomem adc_reg_base = NULL;
 // product codes
 static int adc_get_chan_status(int chan_no)
 {
-    return 0;
+    u32 regv = readl(adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
+
+    return ( regv & (1 << chan_no) ) >> chan_no;
 }
 
 static int adc_get_clock_divisor(void)
