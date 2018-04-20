@@ -102,9 +102,12 @@ static inline int __ASSERT_EQUAL_STRING(
     } while (0)
 
 #define TEST_END(__cnt_macro_val) do {\
-        OUTPUT_MSG("%s\n", 0==(__cnt_macro_val) ? "OK" : "FAILED");\
-        OUTPUT_MSG("*********************\n"); \
-        test_teardown(); \
+        if (__cnt_macro_val > 0)\
+            OUTPUT_MSG("FAILED! %d test failed!\n", __cnt_macro_val);\
+        else\
+            OUTPUT_MSG("OK\n");\
+        OUTPUT_MSG("*********************\n");\
+        test_teardown();\
     } while (0)
 
 #endif
