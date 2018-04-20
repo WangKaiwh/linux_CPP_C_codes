@@ -71,6 +71,11 @@ static int adc_ioctl (struct file *filp,
     return 0;
 }
 
+static void adc_init()
+{
+    adc_set_clock(0x40);
+}
+
 // tdd test codes
 #if ENABLE_TDD > 0
 #include "test_template/test_template.h"
@@ -123,10 +128,12 @@ int test_adc_mod_init__ioctl_set_clock(void)
 
 int __init adc_mod_init(void)
 {
-    
+
 #if ENABLE_TDD > 0
     int __unity_cnt = 0;
     TEST_BEGIN(__unity_cnt);
+
+    adc_init(); // temp
     
     RUN_TEST(test_adc_mod_init__all_chan_disable(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__clock_divisor_0x40(), __unity_cnt);
