@@ -124,6 +124,18 @@ int test_adc_mod_init__ioctl_set_clock(void)
     
     return true;
 }
+
+int test_mesure_adc__before_enable(void)
+{
+    IO_ACCESS_DATA io_data;
+
+    int ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
+
+    TEST_ASSERT_TRUE(0 != ret);
+
+    return true;
+}
+
 #endif
 
 int __init adc_mod_init(void)
@@ -139,6 +151,7 @@ int __init adc_mod_init(void)
     RUN_TEST(test_adc_mod_init__clock_divisor_0x40(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__reg_chardev(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__ioctl_set_clock(), __unity_cnt);
+    RUN_TEST(test_mesure_adc__before_enable(), __unity_cnt);
 
     TEST_END(__unity_cnt);
 #endif

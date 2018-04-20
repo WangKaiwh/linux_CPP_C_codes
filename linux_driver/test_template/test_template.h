@@ -73,7 +73,27 @@ static inline int __ASSERT_EQUAL_STRING(
 
     int realsize = MIN(l_bufsize, r_bufsize);
 
-    return 0 == strncmp(left, right, realsize);
+    if (0 != strncmp(left, right, realsize))
+    {
+        OUTPUT_MSG("%s, %s, %d, FAILED! left: %s, right: %s\n", 
+            file, func, line, left, right);
+        return false;
+    }
+    return true;
+}
+
+static inline int __ASSERT_TRUE(
+        const char *file,
+        const char *func,
+        int line,
+        int condition)
+{
+    if (true != condition)
+    {
+        OUTPUT_MSG("assert true, but actual false\n");
+        return false;
+    }
+    return true;
 }
 
 /////////////////////////////////////////////// 
@@ -88,6 +108,11 @@ static inline int __ASSERT_EQUAL_STRING(
     if ( false == __ASSERT_EQUAL_STRING(__FILE__, __func__, __LINE__, \
         (left), (l_bufsize), (right), (r_bufsize)) ) \
         return false; \
+    } while (0)
+
+#define TEST_ASSERT_TRUE(condition) do {\
+    if ( false == __ASSERT_TRUE(__FILE__, __func__, __LINE__, (condition)) )\
+        return false;\
     } while (0)
 
 #define TEST_BEGIN(__cnt_macro_val) do {\
