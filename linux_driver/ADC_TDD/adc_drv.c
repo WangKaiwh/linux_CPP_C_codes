@@ -125,13 +125,30 @@ int test_adc_mod_init__ioctl_set_clock(void)
     return true;
 }
 
-int test_mesure_adc__before_enable(void)
+int test_adc_measure__before_enable(void)
 {
     IO_ACCESS_DATA io_data;
 
+    io_data.Address = 1;
     int ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
 
     TEST_ASSERT_TRUE(0 != ret);
+
+    return true;
+}
+
+int test_adc_enable_chan__after_enable_status_on(void)
+{
+    int ret = -1;
+    IO_ACCESS_DATA io_data;
+
+    io_data.Address = 2;
+    io_data.Data = 1;
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
+
+    ret = adc_get_chan_status(2);
+
+    TEST_ASSERT_EQUAL_INT(1, ret);
 
     return true;
 }
@@ -151,7 +168,8 @@ int __init adc_mod_init(void)
     RUN_TEST(test_adc_mod_init__clock_divisor_0x40(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__reg_chardev(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__ioctl_set_clock(), __unity_cnt);
-    RUN_TEST(test_mesure_adc__before_enable(), __unity_cnt);
+    RUN_TEST(test_adc_measure__before_enable(), __unity_cnt);
+    RUN_TEST(test_adc_enable_chan__after_enable_status_on(), __unity_cnt);
 
     TEST_END(__unity_cnt);
 #endif
