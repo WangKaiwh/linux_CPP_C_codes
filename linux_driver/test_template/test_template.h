@@ -65,13 +65,15 @@ static inline int __ASSERT_EQUAL_STRING(
         const char *right,
         int r_bufsize)
 {
+    int realsize = 0;
+    
     if (NULL == left || NULL == right)
     {
         OUTPUT_MSG("null pointer error!!!\n");
         return false;
     }
 
-    int realsize = MIN(l_bufsize, r_bufsize);
+    realsize = MIN(l_bufsize, r_bufsize);
 
     if (0 != strncmp(left, right, realsize))
     {
@@ -90,7 +92,8 @@ static inline int __ASSERT_TRUE(
 {
     if (true != condition)
     {
-        OUTPUT_MSG("assert true, but actual false\n");
+        OUTPUT_MSG("%s, %s, %d, FAILED! assert true, but actual false\n",
+            file, func, line);
         return false;
     }
     return true;

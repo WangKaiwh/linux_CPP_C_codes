@@ -70,27 +70,44 @@ static void adc_enable_chan(int chan_no, int enable)
     writel(regv, adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
 }
 
+static int adc_measure(int chan_no)
+{
+    void *__iomem database = adc_reg_base + ADC_DATA_REGISTER;
+
+    u8 offset = 4 * (chan_no / 2);
+
+    u32 regv = readl(database + offset);
+
+    if (0 == chan_no % 2)
+        return (regv >> 16) & 0x3ff;
+    else 
+        return regv & 0x3ff;
+}
+
 static int adc_ioctl (struct file *filp,
                             unsigned int cmd,
-                            unsigned long arg) 
+                            unsigned long arg)
 {
     IO_ACCESS_DATA *io_access = (IO_ACCESS_DATA *)arg;
 
     switch (cmd)
     {
         case IOCTL_SET_ADC_CLOCK:
-        adc_set_clock(io_access->Data);
-        return 0;
+            adc_set_clock(io_access->Data);
+            return 0;
+        case IOCTL_ADC_MEASURE:
+            adc_measure(io_access->Address);
+            return 0;
         case IOCTL_ENABLE_ADC:
-        adc_enable_chan(io_access->Address, io_access->Data);
-        return 0;
-        break;
+            adc_enable_chan(io_access->Address, io_access->Data);
+            return 0;
+            break;
         default:
-        return -1;
+            return -1;
     }
 }
 
-static void adc_init()
+static void adc_init(void)
 {
     adc_set_clock(0x40);
 }
@@ -133,6 +150,8 @@ int test_adc_mod_init__ioctl_set_clock(void)
     int result_divisor = 0;
 
     IO_ACCESS_DATA io_data;
+
+    memset(&io_data, 0, sizeof(io_data));
     io_data.Data = set_divisor;
 
     adc_ioctl(NULL, IOCTL_SET_ADC_CLOCK, (unsigned long)&io_data);
@@ -146,32 +165,84 @@ int test_adc_mod_init__ioctl_set_clock(void)
 
 int test_adc_measure__before_enable(void)
 {
+    int ret = 0;
     IO_ACCESS_DATA io_data;
 
+    memset(&io_data, 0, sizeof(io_data));
     io_data.Address = 1;
-    int ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
+    ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
 
     TEST_ASSERT_TRUE(0 != ret);
 
     return true;
 }
 
-int test_adc_enable_chan__after_enable_status_on(void)
+int test_adc_get_chan_status__after_enable_status_on(void)
 {
     int ret = -1;
     IO_ACCESS_DATA io_data;
 
+    // disable firstly    
+    memset(&io_data, 0, sizeof(io_data));
+    io_data.Address = 2;
+    io_data.Data = 0;
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
+
+    // enable secondly
+    memset(&io_data, 0, sizeof(io_data));
     io_data.Address = 2;
     io_data.Data = 1;
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
 
+    // check status
     ret = adc_get_chan_status(2);
-
     TEST_ASSERT_EQUAL_INT(1, ret);
 
     return true;
 }
 
+int test_adc_get_chan_status__after_disable_status_off(void)
+{
+    int ret = -1;
+    IO_ACCESS_DATA io_data;
+
+    // enable firstly
+    memset(&io_data, 0, sizeof(io_data));
+    io_data.Address = 3;
+    io_data.Data = 1;
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
+
+    // disable secondly    
+    memset(&io_data, 0, sizeof(io_data));
+    io_data.Address = 3;
+    io_data.Data = 0;
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
+
+    ret = adc_get_chan_status(3);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    return true;
+}
+
+int test_adc_measure__when_chan_enable(void)
+{
+    IO_ACCESS_DATA io_data;
+
+    // first, enable one chan
+    memset(&io_data, 0, sizeof(io_data));
+    io_data.Address = 4;
+    io_data.Data = 1;
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
+
+    // second, measure
+    memset(&io_data, 0, sizeof(io_data));
+    io_data.Address = 4;
+    adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
+    TEST_ASSERT_TRUE(0 != io_data.Data);
+
+    return true;
+}
 #endif
 
 int __init adc_mod_init(void)
@@ -188,7 +259,10 @@ int __init adc_mod_init(void)
     RUN_TEST(test_adc_mod_init__reg_chardev(), __unity_cnt);
     RUN_TEST(test_adc_mod_init__ioctl_set_clock(), __unity_cnt);
     RUN_TEST(test_adc_measure__before_enable(), __unity_cnt);
-    RUN_TEST(test_adc_enable_chan__after_enable_status_on(), __unity_cnt);
+    RUN_TEST(test_adc_get_chan_status__after_enable_status_on(), __unity_cnt);
+    RUN_TEST(test_adc_get_chan_status__after_disable_status_off(), __unity_cnt);
+    RUN_TEST(test_adc_measure__when_chan_enable(), __unity_cnt);
+    
 
     TEST_END(__unity_cnt);
 #endif
