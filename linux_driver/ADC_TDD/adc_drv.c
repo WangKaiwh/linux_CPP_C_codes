@@ -54,6 +54,11 @@ static void adc_set_clock(int divisor)
     writel(regv, adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
 }
 
+static void adc_enable_chan(int chan_no, int enable)
+{
+    
+}
+
 static int adc_ioctl (struct file *filp,
                             unsigned int cmd,
                             unsigned long arg) 
@@ -64,6 +69,9 @@ static int adc_ioctl (struct file *filp,
     {
         case IOCTL_SET_ADC_CLOCK:
         adc_set_clock(io_access->Data);
+        return 0;
+        case IOCTL_ENABLE_ADC:
+        adc_enable_chan(io_access->Address, io_access->Data);
         return 0;
         break;
         default:
