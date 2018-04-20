@@ -64,11 +64,11 @@ static int adc_ioctl (struct file *filp,
     {
         case IOCTL_SET_ADC_CLOCK:
         adc_set_clock(io_access->Data);
+        return 0;
         break;
-        
+        default:
+        return -1;
     }
-    
-    return 0;
 }
 
 static void adc_init()
