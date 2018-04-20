@@ -70,7 +70,7 @@ static void adc_enable_chan(int chan_no, int enable)
     writel(regv, adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
 }
 
-static int adc_measure(int chan_no)
+static u32 adc_measure(int chan_no)
 {
     void *__iomem database = adc_reg_base + ADC_DATA_REGISTER;
 
@@ -93,15 +93,24 @@ static int adc_ioctl (struct file *filp,
     switch (cmd)
     {
         case IOCTL_SET_ADC_CLOCK:
+        {
             adc_set_clock(io_access->Data);
             return 0;
+        }
+        
         case IOCTL_ADC_MEASURE:
-            adc_measure(io_access->Address);
+        {
+            u32 rawdata = 0;
+            rawdata = adc_measure(io_access->Address);
+            io_access->Data = rawdata;
             return 0;
+        }
+        
         case IOCTL_ENABLE_ADC:
+        {
             adc_enable_chan(io_access->Address, io_access->Data);
             return 0;
-            break;
+        }
         default:
             return -1;
     }
