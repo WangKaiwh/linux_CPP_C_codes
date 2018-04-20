@@ -54,9 +54,18 @@ static void adc_set_clock(int divisor)
     writel(regv, adc_reg_base + ADC_CLOCK_CONTROL_REGISTER);
 }
 
+// chan_no, which to control
+// enable,  enabled or disabled
 static void adc_enable_chan(int chan_no, int enable)
 {
-    
+    u32 regv = readl(adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
+
+    regv &= ~(1 << chan_no);
+
+    if (1 == enable)
+        regv |= 1 << chan_no;
+
+    writel(regv, adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
 }
 
 static int adc_ioctl (struct file *filp,
