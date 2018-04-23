@@ -284,6 +284,30 @@ int test_adc_measure__when_chan_enable(void)
     return true;
 }
 
+int test_adc_measure__when_chan_disable(void)
+{    
+    IO_ACCESS_DATA io_data;
+    int ret = 0;
+
+    // enable chan 5
+    adc_set_io_data_addr_data(&io_data, 5, 1);
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (u32)&io_data);
+
+    adc_set_io_data_addr(&io_data, 5);
+    ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (u32)&io_data);
+    TEST_ASSERT_EQUAL_INT(0, ret);
+
+    // disable chan 5
+    adc_set_io_data_addr_data(&io_data, 5, 0);
+    adc_ioctl(NULL, IOCTL_ENABLE_ADC, (u32)&io_data);
+
+    adc_set_io_data_addr(&io_data, 5);
+    ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (u32)&io_data);
+    TEST_ASSERT_EQUAL_INT(-1, ret);
+
+    return true;
+}
+
 #define IO_DATA_POINTER_CHECK(__pointer__) do {\
     if (NULL == __pointer__) {\
         printk(KERN_EMERG "%s nullptr!\n", __func__); \
@@ -336,6 +360,7 @@ int __init adc_mod_init(void)
     RUN_TEST(test_adc_get_chan_status__after_enable_status_on(), __unity_cnt);
     RUN_TEST(test_adc_get_chan_status__after_disable_status_off(), __unity_cnt);
     RUN_TEST(test_adc_measure__when_chan_enable(), __unity_cnt);
+    RUN_TEST(test_adc_measure__when_chan_disable(), __unity_cnt);
 
     TEST_END(__unity_cnt);
 #endif
