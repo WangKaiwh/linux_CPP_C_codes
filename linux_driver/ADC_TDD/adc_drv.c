@@ -74,11 +74,12 @@ static int adc_measure(int chan_no)
 {
     void * const __iomem database = adc_reg_base + ADC_DATA_REGISTER;
     u8 offset = 4 * (chan_no / 2);
+    u32 regv = 0;
 
     if (0 == adc_get_chan_status(chan_no))
         return -1;
 
-    u32 regv = readl(database + offset);
+    regv = readl(database + offset);
 
     if (0 != chan_no % 2)
         return (regv >> 16) & 0x3ff;
@@ -132,6 +133,14 @@ static void adc_init(void)
 #if ENABLE_TDD > 0
 #include "test_template/test_template.h"
 
+static inline void adc_set_io_data_addr(IO_ACCESS_DATA *p_io_data, u32 addr);
+
+static inline void adc_set_io_data_data(IO_ACCESS_DATA *p_io_data, u32 data);
+
+static inline void adc_set_io_data_addr_data(IO_ACCESS_DATA *p_io_data, 
+    u32 addr, u32 data);
+
+
 void test_setup(void)
 {
     adc_reg_base = kmalloc(4096, GFP_KERNEL);
@@ -168,8 +177,7 @@ int test_adc_mod_init__ioctl_set_clock(void)
 
     IO_ACCESS_DATA io_data;
 
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Data = set_divisor;
+    adc_set_io_data_data(&io_data, set_divisor);
 
     adc_ioctl(NULL, IOCTL_SET_ADC_CLOCK, (unsigned long)&io_data);
 
@@ -185,8 +193,8 @@ int test_adc_measure__before_enable(void)
     int ret = 0;
     IO_ACCESS_DATA io_data;
 
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 1;
+    adc_set_io_data_addr(&io_data, 1);
+    
     ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
 
     TEST_ASSERT_EQUAL_INT(-1, ret);
@@ -200,15 +208,11 @@ int test_adc_get_chan_status__after_enable_status_on(void)
     IO_ACCESS_DATA io_data;
 
     // disable firstly    
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 2;
-    io_data.Data = 0;
+    adc_set_io_data_addr_data(&io_data, 2, 0);
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
 
     // enable secondly
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 2;
-    io_data.Data = 1;
+    adc_set_io_data_addr_data(&io_data, 2, 1);
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
 
     // check status
@@ -224,15 +228,11 @@ int test_adc_get_chan_status__after_disable_status_off(void)
     IO_ACCESS_DATA io_data;
 
     // enable firstly
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 3;
-    io_data.Data = 1;
+    adc_set_io_data_addr_data(&io_data, 3, 1);
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
 
     // disable secondly    
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 3;
-    io_data.Data = 0;
+    adc_set_io_data_addr_data(&io_data, 3, 0);
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
 
     ret = adc_get_chan_status(3);
@@ -272,13 +272,10 @@ int test_adc_measure__when_chan_enable(void)
     // stub val 
     adc_set_stubval(4, stubval);
     // first, enable one chan
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 4;
-    io_data.Data = 1;
+    adc_set_io_data_addr_data(&io_data, 4, 1);
     adc_ioctl(NULL, IOCTL_ENABLE_ADC, (unsigned long)&io_data);
     // second, measure
-    memset(&io_data, 0, sizeof(io_data));
-    io_data.Address = 4;
+    adc_set_io_data_addr(&io_data, 4);
     ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
 
     TEST_ASSERT_EQUAL_INT(0, ret);
@@ -286,6 +283,40 @@ int test_adc_measure__when_chan_enable(void)
 
     return true;
 }
+
+#define IO_DATA_POINTER_CHECK(__pointer__) do {\
+    if (NULL == __pointer__) {\
+        printk(KERN_EMERG "%s nullptr!\n", __func__); \
+        return; \
+    } \
+}while (0)
+
+static inline void adc_set_io_data_addr(IO_ACCESS_DATA *p_io_data, u32 addr)
+{
+    IO_DATA_POINTER_CHECK(p_io_data);
+    
+    memset(p_io_data, 0, sizeof(IO_ACCESS_DATA));
+    p_io_data->Address = addr;
+}
+
+static inline void adc_set_io_data_data(IO_ACCESS_DATA *p_io_data, u32 data)
+{
+    IO_DATA_POINTER_CHECK(p_io_data);
+
+    memset(p_io_data, 0, sizeof(IO_ACCESS_DATA));
+    p_io_data->Data = data;
+}
+
+static inline void adc_set_io_data_addr_data(IO_ACCESS_DATA *p_io_data, 
+    u32 addr, u32 data)
+{
+    IO_DATA_POINTER_CHECK(p_io_data);
+
+    memset(p_io_data, 0, sizeof(IO_ACCESS_DATA));
+    p_io_data->Address = addr;
+    p_io_data->Data = data;
+}
+
 #endif
 
 int __init adc_mod_init(void)
