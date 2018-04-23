@@ -130,10 +130,11 @@ static inline int __ASSERT_TRUE(
     } while (0)
 
 #define TEST_END(__cnt_macro_val) do {\
-        if (__cnt_macro_val > 0)\
+        if (__cnt_macro_val > 0){\
             OUTPUT_MSG("FAILED! %d test failed!\n", __cnt_macro_val);\
-        else\
+        }else{\
             OUTPUT_MSG("OK\n");\
+        }\
         OUTPUT_MSG("*********************\n");\
         test_teardown();\
     } while (0)

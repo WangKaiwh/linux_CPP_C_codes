@@ -70,9 +70,9 @@ static void adc_enable_chan(int chan_no, int enable)
     writel(regv, adc_reg_base + ADC_ENGINE_CONTROL_REGISTER);
 }
 
-static u32 adc_measure(int chan_no)
+static int adc_measure(int chan_no)
 {
-    void *__iomem database = adc_reg_base + ADC_DATA_REGISTER;
+    void * const __iomem database = adc_reg_base + ADC_DATA_REGISTER;
     u8 offset = 4 * (chan_no / 2);
 
     if (0 == adc_get_chan_status(chan_no))
@@ -80,7 +80,7 @@ static u32 adc_measure(int chan_no)
 
     u32 regv = readl(database + offset);
 
-    if (0 == chan_no % 2)
+    if (0 != chan_no % 2)
         return (regv >> 16) & 0x3ff;
     else 
         return regv & 0x3ff;
@@ -102,7 +102,7 @@ static int adc_ioctl (struct file *filp,
         
         case IOCTL_ADC_MEASURE:
         {
-            u32 rawdata = 0;
+            int rawdata = 0;
             
             rawdata = adc_measure(io_access->Address);
             if (rawdata < 0)
@@ -189,7 +189,7 @@ int test_adc_measure__before_enable(void)
     io_data.Address = 1;
     ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
 
-    TEST_ASSERT_TRUE(0 != ret);
+    TEST_ASSERT_EQUAL_INT(-1, ret);
 
     return true;
 }
@@ -244,7 +244,7 @@ int test_adc_get_chan_status__after_disable_status_off(void)
 
 static void adc_set_stubval(int chan_no, u16 stubval)
 {
-    void * __iomem base = adc_reg_base + ADC_DATA_REGISTER;
+    void * __iomem const base = adc_reg_base + ADC_DATA_REGISTER;
     u8 offset = 4 * (chan_no / 2);
     u32 regv = 0;
 
@@ -266,6 +266,7 @@ static void adc_set_stubval(int chan_no, u16 stubval)
 int test_adc_measure__when_chan_enable(void)
 {
     IO_ACCESS_DATA io_data;
+    int ret = -1;
     u16 stubval = 0xa5;
 
     // stub val 
@@ -278,7 +279,9 @@ int test_adc_measure__when_chan_enable(void)
     // second, measure
     memset(&io_data, 0, sizeof(io_data));
     io_data.Address = 4;
-    adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
+    ret = adc_ioctl(NULL, IOCTL_ADC_MEASURE, (unsigned long)&io_data);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
     TEST_ASSERT_EQUAL_INT(stubval, io_data.Data);
 
     return true;
@@ -302,7 +305,6 @@ int __init adc_mod_init(void)
     RUN_TEST(test_adc_get_chan_status__after_enable_status_on(), __unity_cnt);
     RUN_TEST(test_adc_get_chan_status__after_disable_status_off(), __unity_cnt);
     RUN_TEST(test_adc_measure__when_chan_enable(), __unity_cnt);
-    
 
     TEST_END(__unity_cnt);
 #endif
