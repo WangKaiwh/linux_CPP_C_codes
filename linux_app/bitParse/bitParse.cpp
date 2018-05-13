@@ -57,6 +57,7 @@ private:
 		{
 			printf("%01d  ", (segment>>i) & 0x1);
 		}
+		printf("|");
 	}
 
 	void _print_bit_tag() const
@@ -65,6 +66,8 @@ private:
 		for (int i=_val_bit_len-1; i>=0; i--)
 		{
 			printf("%02d ", i);
+			if (i%_seg_bit_len == 0)
+				printf("|");
 		}
 		printf("\n");
 	}
