@@ -104,7 +104,8 @@ int main(int argc, char **argv)
 	{
 		val = strtoul(argv[1], NULL, 16);
 	}
-	else
+
+	if (0 == val)
 	{
 		usage(argv[0]);
 	}
