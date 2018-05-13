@@ -90,6 +90,11 @@ void usage(const char *name)
 	exit(-1);
 }
 
+static bool is_parameter_invalid(u64 val, int argc, u8 val_bit_len)
+{
+	return 0 == val || (3 == argc && 0 == val_bit_len);
+}
+
 int main(int argc, char **argv)
 {
 	u64 val = 0;
@@ -105,7 +110,7 @@ int main(int argc, char **argv)
 		val = strtoul(argv[1], NULL, 16);
 	}
 
-	if (0 == val)
+	if (is_parameter_invalid(val, argc, val_bit_len))
 	{
 		usage(argv[0]);
 	}
