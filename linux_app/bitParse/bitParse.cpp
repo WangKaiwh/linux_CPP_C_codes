@@ -24,25 +24,7 @@ public:
 		, _val_bit_len(val_bit_len)
 	{}
 
-	void _print_segval_with_bit(u8 segment, u8 seg_index) const
-	{
-		for (int i = 0; i < _seg_bit_len; i++)
-		{
-			printf("%01d  ", (segment>>i) & 0x1);
-		}
-	}
-
-	void _print_bit_tag() const
-	{
-		printf("bit ");
-		for (int i=_val_bit_len-1; i>=0; i--)
-		{
-			printf("%02d ", i);
-		}
-		printf("\n");
-	}
-
-	void print()
+	void parse()
 	{
 		_val_to_segval();
 
@@ -69,6 +51,24 @@ private:
 		}
 	}
 
+	void _print_segval_with_bit(u8 segment, u8 seg_index) const
+	{
+		for (int i = 0; i < _seg_bit_len; i++)
+		{
+			printf("%01d  ", (segment>>i) & 0x1);
+		}
+	}
+
+	void _print_bit_tag() const
+	{
+		printf("bit ");
+		for (int i=_val_bit_len-1; i>=0; i--)
+		{
+			printf("%02d ", i);
+		}
+		printf("\n");
+	}
+
 	u64 _val;
 	vector<u8> _segment;
 	const int _seg_bit_len;
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 {
 	bitParse val(0xaa55);
 
-	val.print();
+	val.parse();
 
 	return 0;
 }
