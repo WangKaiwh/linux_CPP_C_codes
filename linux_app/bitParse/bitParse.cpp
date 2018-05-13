@@ -7,6 +7,7 @@
 #include <vector>
 #include <cstdio>
 #include <cmath>
+#include <cstdlib>
 
 using std::vector;
 
@@ -17,17 +18,20 @@ typedef unsigned char u8;
 		(  ( (val) >> ( (seg_index)*_seg_bit_len) ) \
 			& 0xf  )
 
+#define BIT_OF_SEG(seg, bit) \
+		(  ( (seg) >> bit ) & 0x1  )
 
 class bitParse {
 public:
-	bitParse(u64 val, u8 val_bit_len=32) : _val(val), _seg_bit_len(4)
-		, _val_bit_len(val_bit_len)
+	bitParse(u64 val, u8 val_bit_len=32) :
+		_val(val),
+		_seg_bit_len(4),
+		_val_bit_len(val_bit_len)
 	{}
 
 	void parse()
 	{
 		_val_to_segval();
-
 		_print_bit_tag();
 
 		printf("    ");
@@ -53,9 +57,9 @@ private:
 
 	void _print_segval_with_bit(u8 segment, u8 seg_index) const
 	{
-		for (int i = 0; i < _seg_bit_len; i++)
+		for (int i = _seg_bit_len - 1; i >= 0; i--)
 		{
-			printf("%01d  ", (segment>>i) & 0x1);
+			printf("%01d  ", BIT_OF_SEG(segment, i));
 		}
 		printf("|");
 	}
@@ -67,7 +71,9 @@ private:
 		{
 			printf("%02d ", i);
 			if (i%_seg_bit_len == 0)
+			{
 				printf("|");
+			}
 		}
 		printf("\n");
 	}
@@ -78,11 +84,41 @@ private:
 	int _val_bit_len;
 };
 
+void usage(const char *name)
+{
+	printf("%s val_in_hex [val_bit_len_in_decimal]\n", name);
+	exit(-1);
+}
+
 int main(int argc, char **argv)
 {
-	bitParse val(0xaa55);
+	u64 val = 0;
+	u8  val_bit_len = 0;
 
-	val.parse();
+	if (argc == 3)
+	{
+		val = strtoul(argv[1], NULL, 16);
+		val_bit_len = strtoul(argv[2], NULL, 10);
+	}
+	else if (argc == 2)
+	{
+		val = strtoul(argv[1], NULL, 16);
+	}
+	else
+	{
+		usage(argv[0]);
+	}
+
+	if (0 == val_bit_len)
+	{
+		bitParse parser(val);
+		parser.parse();
+	}
+	else
+	{
+		bitParse parser(val, val_bit_len);
+		parser.parse();
+	}
 
 	return 0;
 }
