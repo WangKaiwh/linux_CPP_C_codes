@@ -20,21 +20,24 @@ typedef unsigned char u8;
 
 class bitParse {
 public:
-	bitParse(u64 val) : _val(val), _seg_bit_len(4)
-		, _val_bit_len(64)
+	bitParse(u64 val, u8 val_bit_len=32) : _val(val), _seg_bit_len(4)
+		, _val_bit_len(val_bit_len)
 	{}
 
-	void print_with_bit(u8 segment, u8 seg_index) const
+	void _print_segval_with_bit(u8 segment, u8 seg_index) const
 	{
 		for (int i = 0; i < _seg_bit_len; i++)
 		{
-			printf("%02d ", seg_index * _seg_bit_len + i);
+			printf("%01d  ", (segment>>i) & 0x1);
 		}
-		printf("\n");
+	}
 
-		for (int i = 0; i < _seg_bit_len; i++)
+	void _print_bit_tag() const
+	{
+		printf("bit ");
+		for (int i=_val_bit_len-1; i>=0; i--)
 		{
-			printf("%01d ", (segment>>i) & 0x1);
+			printf("%02d ", i);
 		}
 		printf("\n");
 	}
@@ -43,10 +46,14 @@ public:
 	{
 		_val_to_segval();
 
+		_print_bit_tag();
+
+		printf("    ");
+
 		for (int i = _val_bit_len/_seg_bit_len - 1;
 				i >= 0; i--)
 		{
-			print_with_bit(_segment[i], i);
+			_print_segval_with_bit(_segment[i], i);
 		}
 		printf("\n");
 	}
@@ -65,7 +72,7 @@ private:
 	u64 _val;
 	vector<u8> _segment;
 	const int _seg_bit_len;
-	const int _val_bit_len;
+	int _val_bit_len;
 };
 
 int main(int argc, char **argv)
