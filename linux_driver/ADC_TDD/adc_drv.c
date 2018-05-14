@@ -74,7 +74,7 @@ static int adc_measure(int chan_no)
 {
     void * const __iomem database = adc_reg_base + ADC_DATA_REGISTER;
     u8 offset = 4 * (chan_no / 2);
-    u32 regv = 0;
+    int regv = 0;
 
     if (0 == adc_get_chan_status(chan_no))
         return -1;
@@ -119,14 +119,36 @@ static int adc_ioctl (struct file *filp,
             adc_enable_chan(io_access->Address, io_access->Data);
             return 0;
         }
+        
         default:
+        {
             return -1;
+        }
     }
 }
 
 static void adc_init(void)
 {
     adc_set_clock(0x40);
+}
+
+//
+// Main struct of this driver.
+//
+static struct file_operations adc_ops = {
+    .unlocked_ioctl = NULL
+};
+
+static int adc_drv_reg_chardev(void)
+{
+    int ret = -1;
+    
+    ret = register_chrdev(255, "kevin adc driver", &adc_ops);
+
+    if (ret < 0)
+        printk(KERN_EMERG "register_chrdev error, ret = %d\n", ret);
+
+    return 0;
 }
 
 // tdd test codes
@@ -166,7 +188,8 @@ int test_adc_mod_init__clock_divisor_0x40(void)
 
 int test_adc_mod_init__reg_chardev(void)
 {
-    // nothing do to
+    //
+
     return true;
 }
 
@@ -345,6 +368,7 @@ static inline void adc_set_io_data_addr_data(IO_ACCESS_DATA *p_io_data,
 
 int __init adc_mod_init(void)
 {
+    adc_drv_reg_chardev();
 
 #if ENABLE_TDD > 0
     int __unity_cnt = 0;
